@@ -1,0 +1,75 @@
+﻿@page "/manage"
+@inherits BasePage
+@implements IDisposable
+
+<h1>Zarządzanie turniejami</h1>
+
+    <p>Wybierz istniejący turniej lub stwórz nowy</p>
+
+    <div class="col-lg-4">
+        <div class="form-group">
+            <input class="form-control" type="text" bind="@tournamentName" />
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary" onclick="@AddNew">Dodaj nowy</button>
+        </div>
+    </div>
+
+    <hr />
+
+    @if (@tournaments != null)
+    {
+        <div class="list-group col-lg-3">
+            @foreach (var tournament in tournaments)
+            {
+                <a href="manage/editTournament/@tournament.Id" class="list-group-item list-group-item-action">@tournament.Name</a>
+            }
+        </div>
+    }
+
+
+@functions {
+    string tournamentName;
+    List<TournamentViewModel> tournaments;
+
+    protected override Task OnInitAsync()
+    {
+        UriHelper.OnLocationChanged += OnLocationChanged;
+        return GetTournaments();
+    }
+
+    async Task AddNew()
+    {
+        if (!string.IsNullOrWhiteSpace(tournamentName))
+        {
+            var tournamnetId = await ApiClient.SendJsonAuthorizedAsync<int>(HttpMethod.Post, "api/tournament", tournamentName);
+
+            if (tournamnetId > 0)
+            {
+                tournamentName = null;
+                await GetTournaments();
+            }
+        }
+    }
+
+    async Task GetTournaments()
+    {
+        tournaments = await ApiClient.GetJsonAuthorizedAsync<List<TournamentViewModel>>("api/tournament");
+    }
+
+    void OnLocationChanged(object sender, string location)
+    {
+        //Console.WriteLine("Location" + location);
+        //int id = 0;
+        //int.TryParse(Id, out id);
+
+        //selectedTournament = tournaments.FirstOrDefault(t => t.Id == id);
+        //Console.WriteLine("Selected tournament " + selectedTournament?.Name);
+        //StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        UriHelper.OnLocationChanged -= OnLocationChanged;
+    }
+}

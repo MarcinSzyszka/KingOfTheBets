@@ -1,0 +1,147 @@
+﻿@page "/manage/editTournament/{TournamentId}/editRounds/{RoundId}"
+@inherits BetsKing.Client.Pages.BasePage
+
+<h1>Edycja turnieju: @tournament?.Name</h1>
+<hr />
+<h2>Edycja rundy: @round?.Name</h2>
+<hr />
+<h3>Ustal wynikj meczu lub dodaj nowy</h3>
+<hr />
+
+<div class="col-lg-6">
+    <h5>Nowy mecz</h5>
+    <div class="row">
+        <div class="col-lg-3">
+            <label for="teamAName">Team A</label>
+            <input id="teamAName" class="form-control" type="text" bind="@addMatchModel.TeamAName" />
+        </div>
+
+        <div class="col-lg-2">
+            <label for="teamAScore">Score</label>
+            <input id="teamAScore" class="form-control" type="number" min="0" step="1" bind="@addMatchModel.TeamAScoreString" />
+        </div>
+
+        <div class="col-lg-2">
+            <label for="teamBScore">Score</label>
+            <input id="teamBScore" class="form-control" type="number" min="0" step="1" bind="@addMatchModel.TeamBScoreString" />
+        </div>
+
+        <div class="col-lg-3">
+            <label for="teamBName">Team B</label>
+            <input id="teamBName" class="form-control" type="text" bind="@addMatchModel.TeamBName" />
+        </div>
+
+        <div class="col-lg-2">
+            <label for="saveBtn">Dodaj</label>
+            <button id="saveBtn" class="btn btn-primary" onclick="@AddNew">Dodaj</button>
+        </div>
+    </div>
+    <div>
+    </div>
+</div>
+
+<hr />
+
+@if (matches != null)
+{
+    <div class="list-group col-lg-6">
+        @foreach (var match in matches)
+        {
+            @*<div class="list-group-item list-group-item-action">@match.TeamAName</div>*@
+            <div class="row list-group-item list-group-item-action">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label for="teamAName">Team A</label>
+                        <input id="teamAName" class="form-control" type="text" disabled bind="@match.TeamAName" />
+                    </div>
+
+                    <div class="col-lg-2">
+                        <label for="teamAScore">Score</label>
+                        <input id="teamAScore" class="form-control" type="number" min="0" step="1" bind="@match.TeamAScoreString" />
+                    </div>
+
+                    <div class="col-lg-2">
+                        <label for="teamBScore">Score</label>
+                        <input id="teamBScore" class="form-control" type="number" min="0" step="1" bind="@match.TeamBScoreString" />
+                    </div>
+
+                    <div class="col-lg-3">
+                        <label for="teamBName">Team B</label>
+                        <input id="teamBName" class="form-control" type="text" disabled bind="@match.TeamBName" />
+                    </div>
+
+                    <div class="col-lg-2">
+                        <button type="button" class="btn btn-sm" onclick="@(async () => await Save(match))">Zapisz</button>
+                    </div>
+                    <div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+
+@functions {
+    [Parameter]
+    string TournamentId { get; set; }
+    [Parameter]
+    string RoundId { get; set; }
+
+    TournamentViewModel tournament;
+    RoundViewModel round;
+
+    AddMatchViewModel addMatchModel = new AddMatchViewModel();
+
+    List<MatchViewModel> matches;
+
+    protected override async Task OnInitAsync()
+    {
+        int.TryParse(TournamentId, out int tournamentId);
+        int.TryParse(RoundId, out int roundId);
+
+        tournament = await ApiClient.GetJsonAuthorizedAsync<TournamentViewModel>($"api/tournament/{tournamentId}");
+        round = await ApiClient.GetJsonAuthorizedAsync<RoundViewModel>($"api/round/{roundId}");
+
+        await GetAndSetMatches();
+    }
+
+    async Task AddNew()
+    {
+        if (!string.IsNullOrEmpty(addMatchModel.TeamAName) && !string.IsNullOrEmpty(addMatchModel.TeamBName))
+        {
+            addMatchModel.RoundId = round.Id;
+
+            var matchId = await ApiClient.SendJsonAuthorizedAsync<int>(HttpMethod.Post, "api/match", addMatchModel);
+
+            if (matchId > 0)
+            {
+                addMatchModel = new AddMatchViewModel();
+
+                await GetAndSetMatches();
+            }
+        }
+    }
+
+    async Task Save(MatchViewModel model)
+    {
+        UpdateMatchScoreViewModel updateModel = new UpdateMatchScoreViewModel
+        {
+            Id = model.Id,
+            TeamAScoreString = model.TeamAScoreString,
+            TeamBScoreString = model.TeamBScoreString
+        };
+
+        var success = await ApiClient.SendJsonAuthorizedAsync<bool>(HttpMethod.Put, "api/match", updateModel);
+
+        if (success)
+        {
+            //something
+        }
+    }
+
+    async Task GetAndSetMatches()
+    {
+        matches = await ApiClient.GetJsonAuthorizedAsync<List<MatchViewModel>>($"api/match/GetByRound/{round.Id}");
+    }
+}

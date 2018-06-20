@@ -1,5 +1,5 @@
 ﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">BetsKing</a>
+    <a class="navbar-brand" href="">Król typerów</a>
     <button class="navbar-toggler" onclick=@ToggleNavMenu>
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -9,19 +9,24 @@
     <ul class="nav flex-column">
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match=NavLinkMatch.All>
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <span class="oi oi-list" aria-hidden="true"></span> Tabele
             </NavLink>
         </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </li>
+        @if (Gambler.IsAdmin)
+        {
+            <li class="nav-item px-3">
+
+                <NavLink class="nav-link" href="manage">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Zarządzaj turniejami
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+
+                <NavLink class="nav-link" href="gamblers">
+                    <span class="oi oi-people" aria-hidden="true"></span> Zarządzaj typerami
+                </NavLink>
+            </li>
+        }
     </ul>
 </div>
 
@@ -32,4 +37,7 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
+    [Parameter]
+    GamblerViewModel Gambler { get; set; }
 }

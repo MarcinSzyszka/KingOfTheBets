@@ -1,15 +1,19 @@
-﻿@inherits BlazorLayoutComponent
+﻿@inherits BaseLayout
 
 <div class="sidebar">
-    <NavMenu />
+    <NavMenu Gambler="@StaticClientInfoViewModel.Gambler" />
 </div>
 
 <div class="main">
-    <div class="top-row px-4">
-        <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-    </div>
+    <TopMenu Gambler="@StaticClientInfoViewModel.Gambler" />
+    @*<div class="top-row px-4">
+            <a href="login" class="ml-md-auto">Zaloguj</a>
+        </div>*@
 
     <div class="content px-4">
         @Body
     </div>
 </div>
+
+@functions{
+}

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Blazor.Browser.Rendering;
+﻿using BetsKing.Client.Services;
+using BetsKing.Shared.ViewModels;
+using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
+using Microsoft.AspNetCore.Blazor.Browser.Rendering;
 using Microsoft.AspNetCore.Blazor.Browser.Services;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace BetsKing.Client
 {
@@ -11,7 +13,9 @@ namespace BetsKing.Client
         {
             var serviceProvider = new BrowserServiceProvider(services =>
             {
-                // Add any custom services here
+                services.AddStorage();
+                services.Add(ServiceDescriptor.Scoped<IApiClientService, ApiClientService>());
+                services.Add(ServiceDescriptor.Singleton<StaticClientInfoViewModel>(new StaticClientInfoViewModel()));
             });
 
             new BrowserRenderer(serviceProvider).AddComponent<App>("app");

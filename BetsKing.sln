@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetsKing.Server", "BetsKing.Server\BetsKing.Server.csproj", "{AA1B9FC5-D991-41EF-9473-A11DED83A848}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetsKing.Server", "BetsKing.Server\BetsKing.Server.csproj", "{AA1B9FC5-D991-41EF-9473-A11DED83A848}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetsKing.Client", "BetsKing.Client\BetsKing.Client.csproj", "{545FA5A1-9B4D-47AB-91E7-5C193655A3CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetsKing.Client", "BetsKing.Client\BetsKing.Client.csproj", "{545FA5A1-9B4D-47AB-91E7-5C193655A3CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetsKing.Shared", "BetsKing.Shared\BetsKing.Shared.csproj", "{812511B4-251A-4A19-ADD8-9074ED27F4A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetsKing.Shared", "BetsKing.Shared\BetsKing.Shared.csproj", "{F49CF02E-4289-4206-A166-717188486D16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{545FA5A1-9B4D-47AB-91E7-5C193655A3CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{545FA5A1-9B4D-47AB-91E7-5C193655A3CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{545FA5A1-9B4D-47AB-91E7-5C193655A3CD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{812511B4-251A-4A19-ADD8-9074ED27F4A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{812511B4-251A-4A19-ADD8-9074ED27F4A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{812511B4-251A-4A19-ADD8-9074ED27F4A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{812511B4-251A-4A19-ADD8-9074ED27F4A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F49CF02E-4289-4206-A166-717188486D16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F49CF02E-4289-4206-A166-717188486D16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F49CF02E-4289-4206-A166-717188486D16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F49CF02E-4289-4206-A166-717188486D16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

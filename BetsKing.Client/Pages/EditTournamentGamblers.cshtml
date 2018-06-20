@@ -1,0 +1,59 @@
+﻿@page "/manage/editTournament/{Id}/editGamblers"
+@inherits BetsKing.Client.Pages.BasePage
+
+<h1>Zarządzanie typerami turnieju: @tournament?.Name</h1>
+<hr />
+<h3>Dodaj lub usun typerów z turnieju</h3>
+<hr />
+
+@if (gamblers != null)
+{
+    <div class="list-group col-lg-6">
+        @foreach (var gambler in gamblers)
+        {
+            <div class="row list-group-item list-group-item-action">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <label for="teamAName">Nazwa</label>
+                        <input id="teamAName" class="form-control" type="text" disabled bind="@gambler.DisplayName" />
+                    </div>
+
+                    <div class="col-lg-5">
+                        <label for="teamAScore">Login</label>
+                        <input id="teamAScore" class="form-control" type="text" disabled bind="@gambler.UserName" />
+                    </div>
+
+                    <div class="col-lg-2">
+                        <label for="teamBScore">Admin</label>
+                        <input id="teamBScore" class="form-control form-check-input" type="checkbox" bind="@gambler.Participates" />
+                    </div>
+                    <div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+
+@functions {
+
+    [Parameter]
+    string Id { get; set; }
+
+    TournamentViewModel tournament;
+    List<TournamentGamblerViewModel> gamblers;
+
+    protected override async Task OnInitAsync()
+    {
+        int.TryParse(Id, out int id);
+
+        tournament = await ApiClient.GetJsonAuthorizedAsync<TournamentViewModel>($"api/tournament/{id}");
+        await GetAndSetGamblers();
+    }
+
+    async Task GetAndSetGamblers()
+    {
+        gamblers = await ApiClient.GetJsonAuthorizedAsync<List<TournamentGamblerViewModel>>($"api/tournament/gamblersall");
+    }
+}

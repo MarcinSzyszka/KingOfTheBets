@@ -1,0 +1,33 @@
+﻿@page "/manage/editTournament/{Id}"
+@inherits BetsKing.Client.Pages.BasePage
+
+<h1>Edycja turnieju: @tournament?.Name</h1>
+<hr />
+<p>Wybierz co chcesz edytować</p>
+
+<div class="col-lg-3">
+    <div class="row">
+        <div class="col-lg-6">
+            <a class="btn btn-primary" href="manage/editTournament/@tournament?.Id/editRounds">Rundy</a>
+        </div>
+       <div class="col-lg-6">
+            <a class="btn btn-info" href="manage/editTournament/@tournament?.Id/editGamblers">Typerzy</a>
+        </div>
+    </div>
+
+</div>
+
+
+@functions {
+    [Parameter]
+    string Id { get; set; }
+
+    TournamentViewModel tournament;
+
+    protected override async Task OnInitAsync()
+    {
+        int.TryParse(Id, out int id);
+
+        tournament = await ApiClient.GetJsonAuthorizedAsync<TournamentViewModel>($"api/tournament/{id}");
+    }
+}

@@ -1,0 +1,50 @@
+﻿@using BetsKing.Shared.ViewModels.Auth
+@using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
+@inject HttpClient client
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper uriHelper;
+@inject BetsKing.Client.Services.IApiClientService apiClient;
+@inject StaticClientInfoViewModel staticClientInfoModel
+@inject LocalStorage Storage
+
+@page "/login"
+
+<h1>Zaloguj się</h1>
+
+<form>
+    <div class="col-lg-4">
+        <div class="form-group">
+            <label for="userName">Nazwa typera</label>
+            <input type="text" id="userName" class="form-control" name="UserName" placeholder="Wpisz nazwę" bind="@loginViewModel.UserName" />
+        </div>
+        <div class="form-group">
+            <label for="password">Hasło</label>
+            <input type="password" id="password" class="form-control" name="Password" placeholder="Wpisz hasło" bind="@loginViewModel.Password" />
+        </div>
+        <button type="button" class="btn btn-primary" onclick="@(async () => await SignIn())">Zaloguj</button>
+    </div>
+
+</form>
+
+@functions {
+readonly LoginViewModel loginViewModel = new LoginViewModel();
+
+protected async Task SignIn()
+{
+    var response = await apiClient.SendJsonNotAuthorizedAsync<string>(HttpMethod.Post, "api/Gambler/Login", loginViewModel);
+
+    apiClient.AddAuthorizationHeader(response);
+
+    await apiClient.GetAndSetGamblerInfo();
+
+    var uri = new Uri(uriHelper.GetAbsoluteUri());
+    var returnUrl = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("returnUrl", out var type) ? type.First() : "";
+    if (!string.IsNullOrEmpty(returnUrl))
+    {
+        uriHelper.NavigateTo(returnUrl);
+    }
+    else
+    {
+        uriHelper.NavigateTo("/");
+    }
+}
+}
