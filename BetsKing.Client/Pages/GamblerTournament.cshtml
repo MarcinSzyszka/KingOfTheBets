@@ -1,0 +1,151 @@
+﻿@page "/gamblerTournament/{TournamentId}/{GamblerId}"
+@inherits BetsKing.Client.Pages.BasePage
+
+@if (LoggedGambler.Gambler.Id.ToString() == GamblerId)
+{
+    <h1>Moje turnieje</h1>
+}
+else
+{
+    <h1>Turnieje typera @gambler?.DisplayName</h1>
+}
+
+<hr />
+<h3>Turniej: @tournament?.Name</h3>
+<hr />
+<h3>Rundy</h3>
+
+@if (LoggedGambler.Gambler.Id.ToString() == GamblerId)
+{
+    <p>Wybierz rundę aby przejrzeć/dodać typy</p>
+}
+else
+{
+    <p>Wybierz rundę aby przejrzeć typy</p>
+}
+
+
+<hr />
+
+@if (@rounds != null)
+{
+    <div class="list-group col-lg-6">
+        @foreach (var round in rounds)
+        {
+            <div class="card">
+                <button class="list-group-item list-group-item-action" onclick="@((e) => CollapsedChange(round))">@round.Name</button>
+
+                <div class=@(round.Collapsed ? "collapse" : "collapse show")>
+                    <div class="card-body">
+                        @if (LoggedGambler.Gambler.Id.ToString() == GamblerId && round.MatchBets.Any(b => !b.TeamAScoreBet.HasValue))
+                        {
+                            <div class="row">
+                                Po zapisaniu typów nie będzie możliwości ich zmiany!
+                            </div>
+                            <div class="row">
+                                <button id="saveBtn" class="btn btn-primary" onclick="@(async () => await Save(round))">Zapisz typy</button>
+                            </div>
+                            <br />
+
+                        }
+                        @foreach (var matchBet in round.MatchBets)
+                        {
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <label for="teamAName">Team A</label>
+                                    <input id="teamAName" class="form-control" type="text" disabled bind="@matchBet.TeamAName" />
+                                </div>
+
+                                <div class="col-lg-2">
+                                    <label for="teamAScore">Score</label>
+                                    <input id="teamAScore" class="form-control" type="number" disabled=@(LoggedGambler.Gambler.Id.ToString() != GamblerId || matchBet.TeamAScoreBet.HasValue ? "disabled" : null) min="0" step="1" bind="@matchBet.TeamAScoreString" />
+                                </div>
+
+                                <div class="col-lg-2">
+                                    <label for="teamBScore">Score</label>
+                                    <input id="teamBScore" class="form-control" type="number" disabled=@(LoggedGambler.Gambler.Id.ToString() != GamblerId || matchBet.TeamBScoreBet.HasValue ?  "disabled": null) min="0" step="1" bind="@matchBet.TeamBScoreString" />
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <label for="teamBName">Team B</label>
+                                    <input id="teamBName" class="form-control" type="text" disabled bind="@matchBet.TeamBName" />
+                                </div>
+                                <div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+
+
+        }
+    </div>
+}
+
+
+@functions {
+[Parameter]
+string TournamentId { get; set; }
+
+[Parameter]
+string GamblerId { get; set; }
+
+List<RoundWithBetsViewModel> rounds;
+GamblerViewModel gambler;
+TournamentViewModel tournament;
+
+protected override async Task OnInitAsync()
+{
+    gambler = await ApiClient.GetJsonNotAuthorizedAsync<GamblerViewModel>("api/gambler/" + GamblerId);
+
+    tournament = await ApiClient.GetJsonAuthorizedAsync<TournamentViewModel>($"api/tournament/{TournamentId}");
+
+    await GetAndSetRounds();
+}
+
+void CollapsedChange(RoundWithBetsViewModel round)
+{
+    round.Collapsed = !round.Collapsed;
+}
+
+async Task Save(RoundWithBetsViewModel model)
+{
+    var betsToUpdate = model.MatchBets.Where(b => !b.TeamAScoreBet.HasValue && (!string.IsNullOrEmpty(b.TeamAScoreString) && !string.IsNullOrEmpty(b.TeamBScoreString))).ToList();
+
+    if (!betsToUpdate.Any())
+    {
+        return;
+    }
+
+    var saveModel = new SaveMatchBetsViewModel
+    {
+        GamblerId = gambler.Id,
+        RoundId = model.Id
+    };
+
+    var betsUpdateModelList = new List<UpdateMatchBetViewModel>(betsToUpdate.Count);
+
+    foreach (var bet in betsToUpdate)
+    {
+        betsUpdateModelList.Add(new UpdateMatchBetViewModel
+        {
+            Id = bet.Id,
+            TeamAScoreString = bet.TeamAScoreString,
+            TeamBScoreString = bet.TeamBScoreString
+        });
+    }
+
+    saveModel.Bets = betsUpdateModelList;
+
+    var updateBets = await ApiClient.SendJsonAuthorizedAsync<IEnumerable<MatchBetViewModel>>(HttpMethod.Put, "api/round/savebets", saveModel);
+
+    model.MatchBets = updateBets.ToList();
+}
+
+async Task GetAndSetRounds()
+{
+    rounds = await ApiClient.GetJsonAuthorizedAsync<List<RoundWithBetsViewModel>>($"api/round/GetByTournamentAndGambler/{tournament.Id}/{gambler.Id}");
+}
+}

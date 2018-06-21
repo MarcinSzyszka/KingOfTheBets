@@ -20,51 +20,51 @@
 
 @if (@rounds != null)
 {
-<div class="list-group col-lg-3">
-    @foreach (var round in rounds)
+    <div class="list-group col-lg-3">
+        @foreach (var round in rounds)
         {
-    <a href="manage/editTournament/@tournament.Id/editRounds/@round.Id" class="list-group-item list-group-item-action">@round.Name</a>
+            <a href="manage/editTournament/@tournament.Id/editRounds/@round.Id" class="list-group-item list-group-item-action">@round.Name</a>
         }
-</div>
+    </div>
 }
 
 
 @functions {
-    [Parameter]
-    string Id { get; set; }
+[Parameter]
+string Id { get; set; }
 
-    TournamentViewModel tournament;
-    List<RoundViewModel> rounds;
+TournamentViewModel tournament;
+List<RoundViewModel> rounds;
 
-    AddRoundViewModel addRoundModel = new AddRoundViewModel();
+AddRoundViewModel addRoundModel = new AddRoundViewModel();
 
-    protected override async Task OnInitAsync()
+protected override async Task OnInitAsync()
+{
+    int.TryParse(Id, out int id);
+
+    tournament = await ApiClient.GetJsonAuthorizedAsync<TournamentViewModel>($"api/tournament/{id}");
+    await GetAndSetRounds();
+}
+
+async Task AddNew()
+{
+    if (!string.IsNullOrEmpty(addRoundModel.RoundName))
     {
-        int.TryParse(Id, out int id);
+        addRoundModel.TournamentId = tournament.Id;
 
-        tournament = await ApiClient.GetJsonAuthorizedAsync<TournamentViewModel>($"api/tournament/{id}");
-        await GetAndSetRounds();
-    }
+        var roundId = await ApiClient.SendJsonAuthorizedAsync<int>(HttpMethod.Post, "api/round", addRoundModel);
 
-    async Task AddNew()
-    {
-        if (!string.IsNullOrEmpty(addRoundModel.RoundName))
+        if (roundId > 0)
         {
-            addRoundModel.TournamentId = tournament.Id;
+            addRoundModel.RoundName = null;
 
-            var roundId = await ApiClient.SendJsonAuthorizedAsync<int>(HttpMethod.Post, "api/round", addRoundModel);
-
-            if (roundId > 0)
-            {
-                addRoundModel.RoundName = null;
-
-                await GetAndSetRounds();
-            }
+            await GetAndSetRounds();
         }
     }
+}
 
-    async Task GetAndSetRounds()
-    {
-        rounds = await ApiClient.GetJsonAuthorizedAsync<List<RoundViewModel>>($"api/round/GetByTournament/{tournament.Id}");
-    }
+async Task GetAndSetRounds()
+{
+    rounds = await ApiClient.GetJsonAuthorizedAsync<List<RoundViewModel>>($"api/round/GetByTournament/{tournament.Id}");
+}
 }

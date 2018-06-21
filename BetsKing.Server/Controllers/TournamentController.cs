@@ -38,6 +38,14 @@ namespace BetsKing.Server.Controllers
             return Json(Mapper.Map<Tournament, TournamentViewModel>(tournament));
         }
 
+        [HttpGet("GetForGambler/{id}")]
+        public async Task<IActionResult> GetForGambler(int id)
+        {
+            var tournaments = await _tournamentService.GetForGambler(id);
+
+            return Json(Mapper.Map<IEnumerable<Tournament>, IEnumerable<TournamentViewModel>>(tournaments));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] string name)
         {
@@ -45,5 +53,25 @@ namespace BetsKing.Server.Controllers
 
             return Json(tournament.Id);
         }
+
+
+        [HttpGet("getallgamblers/{id}")]
+        public async Task<IActionResult> GetAllGamblers(int id)
+        {
+            var tournamentGamblers = await _tournamentService.GetAllGamblers(id);
+
+            return Json(tournamentGamblers);
+        }
+
+        
+        [HttpPut("setgamblers")]
+        public async Task<IActionResult> SetGamblers([FromBody] SetTournamentGamblersViewModel model)
+        {
+            var result = await _tournamentService.SetGamblers(model);
+
+            return Json(result);
+        }
+
+        
     }
 }

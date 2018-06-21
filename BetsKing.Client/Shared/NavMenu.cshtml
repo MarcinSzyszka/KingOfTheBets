@@ -1,4 +1,6 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@inject IUriHelper uriHelper
+
+<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">Król typerów</a>
     <button class="navbar-toggler" onclick=@ToggleNavMenu>
         <span class="navbar-toggler-icon"></span>
@@ -12,6 +14,15 @@
                 <span class="oi oi-list" aria-hidden="true"></span> Tabele
             </NavLink>
         </li>
+        @if (Gambler.Id > 0)
+        {
+            <li class="nav-item px-3">
+
+                <NavLink class="nav-link" href="@GetMyTournamentsUrl()">
+                    <span class="oi oi-star" aria-hidden="true"></span> Moje turnieje
+                </NavLink>
+            </li>
+        }
         @if (Gambler.IsAdmin)
         {
             <li class="nav-item px-3">
@@ -40,4 +51,9 @@
 
     [Parameter]
     GamblerViewModel Gambler { get; set; }
+
+    string GetMyTournamentsUrl()
+    {
+        return "gamblerTournaments/" + Gambler.Id;
+    }
 }

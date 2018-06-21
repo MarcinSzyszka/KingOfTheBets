@@ -9,6 +9,8 @@ namespace BetsKing.Server.Mappings
         public RoundProfile()
         {
             CreateMap<Round, RoundViewModel>();
+            CreateMap<Round, RoundWithBetsViewModel>()
+                .ForMember(dest => dest.MatchBets, opt => opt.Ignore());
         }
     }
 }

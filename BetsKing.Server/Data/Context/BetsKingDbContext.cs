@@ -29,6 +29,22 @@ namespace BetsKing.Server.Data.Context
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Match>()
+            .Property(b => b.TeamAScore)
+            .IsRequired(false);
+
+             modelBuilder.Entity<Match>()
+            .Property(b => b.TeamBScore)
+            .IsRequired(false);
+
+            modelBuilder.Entity<MatchBet>()
+            .Property(b => b.TeamAScoreBet)
+            .IsRequired(false);
+
+             modelBuilder.Entity<MatchBet>()
+            .Property(b => b.TeamBScoreBet)
+            .IsRequired(false);
+
             modelBuilder.Entity<TournamentGambler>()
                 .HasKey(t => new { t.TournamentId, t.GamblerId });
             modelBuilder.Entity<TournamentGambler>()

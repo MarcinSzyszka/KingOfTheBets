@@ -2,17 +2,13 @@
 
 namespace BetsKing.Shared.ViewModels.Matches
 {
-    public class AddMatchViewModel
+    public class UpdateMatchBetViewModel
     {
-        public string TeamAName { get; set; }
-
-        public string TeamBName { get; set; }
+        public int Id { get; set; }
 
         public string TeamAScoreString { get; set; }
 
         public string TeamBScoreString { get; set; }
-
-        public int RoundId { get; set; }
 
         public int? TeamAScore
         {

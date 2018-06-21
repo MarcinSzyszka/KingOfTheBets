@@ -9,5 +9,7 @@
         public int GamblerId { get; set; }
 
         public Gambler Gambler { get; set; }
+
+        public bool IsActive { get; set; } = true;
     }
 }

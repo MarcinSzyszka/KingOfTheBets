@@ -15,9 +15,9 @@ namespace BetsKing.Shared.ViewModels.Matches
             get
             {
                 var score = -1;
-                int.TryParse(TeamAScoreString, out score);
+                var success = int.TryParse(TeamAScoreString, out score);
 
-                return score > -1 ? new Nullable<int>(score) : null;
+                return success && score > -1 ? new Nullable<int>(score) : null;
             }
         }
 
@@ -26,9 +26,9 @@ namespace BetsKing.Shared.ViewModels.Matches
             get
             {
                 var score = -1;
-                int.TryParse(TeamBScoreString, out score);
+                var success = int.TryParse(TeamBScoreString, out score);
 
-                return score > -1 ? new Nullable<int>(score) : null;
+                return success && score > -1 ? new Nullable<int>(score) : null;
             }
         }
     }

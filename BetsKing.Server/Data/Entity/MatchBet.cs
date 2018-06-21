@@ -10,8 +10,8 @@
 
         public Gambler Gambler { get; set; }
 
-        public int TeamAScoreBet { get; set; }
+        public int? TeamAScoreBet { get; set; } = null;
 
-        public int TeamBScoreBet  { get; set; }
+        public int? TeamBScoreBet  { get; set; } = null;
     }
 }

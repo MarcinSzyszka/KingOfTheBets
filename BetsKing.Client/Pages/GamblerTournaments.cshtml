@@ -1,0 +1,60 @@
+﻿@page "/gamblerTournaments/{Id}"
+@inherits BasePage
+
+@if (LoggedGambler.Gambler.Id.ToString() == Id)
+{
+    <h1>Moje turnieje</h1>
+}
+else
+{
+    <h1>Turnieje typera @gambler?.DisplayName</h1>
+}
+
+<p>Wybierz turniej</p>
+
+@if (@tournaments != null)
+{
+    <div class="list-group col-lg-3">
+        @foreach (var tournament in tournaments)
+        {
+            <a href="gamblerTournament/@tournament.Id/@gambler.Id" class="list-group-item list-group-item-action">@tournament.Name</a>
+        }
+    </div>
+}
+
+
+@functions {
+    [Parameter]
+    string Id { get; set; }
+
+    GamblerViewModel gambler;
+
+    List<TournamentViewModel> tournaments;
+
+    protected override async Task OnInitAsync()
+    {
+        int.TryParse(Id, out int id);
+        gambler = await ApiClient.GetJsonNotAuthorizedAsync<GamblerViewModel>("api/gambler/" + id);
+
+        await GetAndSetTournaments(gambler.Id);
+    }
+
+    //async Task AddNew()
+    //{
+    //    if (!string.IsNullOrWhiteSpace(tournamentName))
+    //    {
+    //        var tournamnetId = await ApiClient.SendJsonAuthorizedAsync<int>(HttpMethod.Post, "api/tournament", tournamentName);
+
+    //        if (tournamnetId > 0)
+    //        {
+    //            tournamentName = null;
+    //            await GetTournaments();
+    //        }
+    //    }
+    //}
+
+    async Task GetAndSetTournaments(int gamblerId)
+    {
+        tournaments = await ApiClient.GetJsonNotAuthorizedAsync<List<TournamentViewModel>>("api/tournament/GetForGambler/" + gambler.Id);
+    }
+}

@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using BetsKing.Server.Data.Entity;
+using BetsKing.Server.Services.Matches;
 using BetsKing.Server.Services.Rounds;
+using BetsKing.Shared.ViewModels.Matches;
 using BetsKing.Shared.ViewModels.Rounds;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -16,9 +18,12 @@ namespace BetsKing.Server.Controllers
     {
         readonly IRoundService _roundService;
 
-        public RoundController(IRoundService roundService)
+        readonly IMatchBetService _matchBetService;
+
+        public RoundController(IRoundService roundService, IMatchBetService matchBetService)
         {
             _roundService = roundService;
+            _matchBetService = matchBetService;
         }
 
         [HttpGet("GetByTournament/{tournamentId}")]
@@ -27,6 +32,14 @@ namespace BetsKing.Server.Controllers
             var tournaments = await _roundService.GetAll(tournamentId);
 
             return Json(Mapper.Map<IEnumerable<Round>, IEnumerable<RoundViewModel>>(tournaments));
+        }
+
+        [HttpGet("GetByTournamentAndGambler/{tournamentId}/{gamblerId}")]
+        public async Task<IActionResult> GetByTournamentAndGambler(int tournamentId, int gamblerId)
+        {
+            var rounds = await _roundService.GetByTournamentAndGambler(tournamentId, gamblerId);
+
+            return Json(rounds);
         }
 
         [HttpGet("{id}")]
@@ -44,5 +57,14 @@ namespace BetsKing.Server.Controllers
 
             return Json(round.Id);
         }
+
+        [HttpPut("SaveBets")]
+        public async Task<IActionResult> SaveBets([FromBody] SaveMatchBetsViewModel model)
+        {
+            var bets = await _matchBetService.SaveBets(model);
+
+            return Json(Mapper.Map<IEnumerable<MatchBet>, IEnumerable<MatchBetViewModel>>(bets));
+        }
+
     }
 }

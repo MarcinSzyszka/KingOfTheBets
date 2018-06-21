@@ -1,6 +1,5 @@
 ﻿@page "/manage"
 @inherits BasePage
-@implements IDisposable
 
 <h1>Zarządzanie turniejami</h1>
 
@@ -34,7 +33,6 @@
 
     protected override Task OnInitAsync()
     {
-        UriHelper.OnLocationChanged += OnLocationChanged;
         return GetTournaments();
     }
 
@@ -55,21 +53,5 @@
     async Task GetTournaments()
     {
         tournaments = await ApiClient.GetJsonAuthorizedAsync<List<TournamentViewModel>>("api/tournament");
-    }
-
-    void OnLocationChanged(object sender, string location)
-    {
-        //Console.WriteLine("Location" + location);
-        //int id = 0;
-        //int.TryParse(Id, out id);
-
-        //selectedTournament = tournaments.FirstOrDefault(t => t.Id == id);
-        //Console.WriteLine("Selected tournament " + selectedTournament?.Name);
-        //StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        UriHelper.OnLocationChanged -= OnLocationChanged;
     }
 }

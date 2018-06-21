@@ -4,7 +4,7 @@
     {
         public int GamblerId { get; set; }
 
-        public int Tournament { get; set; }
+        public int TournamentId { get; set; }
 
         public string UserName { get; set; }
 

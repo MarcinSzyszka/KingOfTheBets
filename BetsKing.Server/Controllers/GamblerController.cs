@@ -35,6 +35,15 @@ namespace BetsKing.Server.Controllers
             return Json(Mapper.Map<Gambler, GamblerViewModel>(gambler));
         }
 
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Get(int id)
+        {
+            var gambler = await _gamblerService.GetGambler(id);
+
+            return Json(Mapper.Map<Gambler, GamblerViewModel>(gambler));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] AddGamblerViewModel model)
         {
@@ -50,7 +59,7 @@ namespace BetsKing.Server.Controllers
 
             return Json(Mapper.Map<IEnumerable<Gambler>, IEnumerable<GamblerViewModel>>(gamblers));
         }
-        
+
         [HttpGet("GetNotAuthorized")]
         [AllowAnonymous]
         public async Task<IActionResult> GetNotAuthorized()

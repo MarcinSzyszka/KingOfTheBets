@@ -6,13 +6,37 @@
 <h3>Dodaj lub usun typerów z turnieju</h3>
 <hr />
 
+
 @if (gamblers != null)
 {
+    <div class="col-lg-6">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" onchange="@CheckedAllChanged" id="defaultCheck1" />
+                    <label class="form-check-label" for="defaultCheck1">
+                        Zaznacz wszystkich
+                    </label>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <input type="button" class="btn btn-primary" value="Zapisz" onclick="@UpdateGamblers" />
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="list-group col-lg-6">
+
         @foreach (var gambler in gamblers)
         {
             <div class="row list-group-item list-group-item-action">
                 <div class="row">
+                    <div class="col-lg-2">
+                        <label for="teamBScore">Uczestnik</label>
+                        <input id="teamBScore" class="form-control form-check-input" type="checkbox" bind="@gambler.Participates" />
+                    </div>
                     <div class="col-lg-5">
                         <label for="teamAName">Nazwa</label>
                         <input id="teamAName" class="form-control" type="text" disabled bind="@gambler.DisplayName" />
@@ -21,11 +45,6 @@
                     <div class="col-lg-5">
                         <label for="teamAScore">Login</label>
                         <input id="teamAScore" class="form-control" type="text" disabled bind="@gambler.UserName" />
-                    </div>
-
-                    <div class="col-lg-2">
-                        <label for="teamBScore">Admin</label>
-                        <input id="teamBScore" class="form-control form-check-input" type="checkbox" bind="@gambler.Participates" />
                     </div>
                     <div>
                     </div>
@@ -41,6 +60,8 @@
     [Parameter]
     string Id { get; set; }
 
+    bool checkedAll;
+
     TournamentViewModel tournament;
     List<TournamentGamblerViewModel> gamblers;
 
@@ -52,8 +73,29 @@
         await GetAndSetGamblers();
     }
 
+    async Task UpdateGamblers()
+    {
+        var updateModel = new SetTournamentGamblersViewModel
+        {
+            TournamentId = tournament.Id,
+            GamblersIds = gamblers.Where(g => g.Participates).Select(g => g.GamblerId)
+        };
+
+        var result = await ApiClient.SendJsonAuthorizedAsync<bool>(HttpMethod.Put, $"api/tournament/setgamblers", updateModel);
+
+    }
+
+    void CheckedAllChanged(UIChangeEventArgs e)
+    {
+        Console.WriteLine("CheckedAllChanged " + (bool)e.Value);
+        foreach (var gambler in gamblers)
+        {
+            gambler.Participates = (bool)e.Value;
+        }
+    }
+
     async Task GetAndSetGamblers()
     {
-        gamblers = await ApiClient.GetJsonAuthorizedAsync<List<TournamentGamblerViewModel>>($"api/tournament/gamblersall");
+        gamblers = await ApiClient.GetJsonAuthorizedAsync<List<TournamentGamblerViewModel>>($"api/tournament/getallgamblers/{tournament.Id}");
     }
 }

@@ -1,5 +1,8 @@
-﻿using BetsKing.Server.Data.Context;
+﻿using AutoMapper;
+using BetsKing.Server.Data.Context;
 using BetsKing.Server.Data.Entity;
+using BetsKing.Shared.ViewModels.Matches;
+using BetsKing.Shared.ViewModels.Rounds;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,6 +26,32 @@ namespace BetsKing.Server.Services.Rounds
                                     .Include(r => r.Matches)
                                     .Where(r => r.TournamentId == tournamentId)
                                     .ToListAsync();
+        }
+
+        public async Task<IEnumerable<RoundWithBetsViewModel>> GetByTournamentAndGambler(int tournamentId, int gamblerId)
+        {
+            var rounds = await _dbContext.Rounds.Include(r => r.Tournament).ThenInclude(t => t.Gamblers)
+                                        .Where(r => r.TournamentId == tournamentId && r.Tournament.Gamblers.Any(g => g.GamblerId == gamblerId && g.IsActive))
+                                        .ToListAsync();
+
+            var results = new List<RoundWithBetsViewModel>(rounds.Count);
+
+            var roundsId = rounds.Select(r => r.Id);
+
+            var gamblerBets = await _dbContext.MatchBets.Include(m => m.Match)
+                                                 .Where(m => m.GamblerId == gamblerId && roundsId.Any(r => r == m.Match.RoundId))
+                                                 .ToListAsync();
+
+            foreach (var round in rounds)
+            {
+                var roundVm = Mapper.Map<Round, RoundWithBetsViewModel>(round);
+
+                roundVm.MatchBets =  Mapper.Map<IEnumerable<MatchBet>, IEnumerable<MatchBetViewModel>>(gamblerBets.Where(b => b.Match.RoundId == round.Id));
+
+                results.Add(roundVm);
+            }
+
+            return results;
         }
 
         public Task<Round> Get(int id)

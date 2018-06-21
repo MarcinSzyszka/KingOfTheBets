@@ -12,10 +12,12 @@ namespace BetsKing.Server.Services.Matches
     public class MatchService : IMatchService
     {
         readonly BetsKingDbContext _dbContext;
+        IMatchBetService _matchBetService;
 
-        public MatchService(BetsKingDbContext dbContext)
+        public MatchService(BetsKingDbContext dbContext, IMatchBetService matchBetService)
         {
             _dbContext = dbContext;
+            _matchBetService = matchBetService;
         }
 
         public async Task<IEnumerable<Match>> GetAll(int roundId)
@@ -33,6 +35,8 @@ namespace BetsKing.Server.Services.Matches
 
         public async Task<Match> Create(AddMatchViewModel model)
         {
+            var tournament = await _dbContext.Tournaments.Include(t => t.Gamblers).FirstOrDefaultAsync(t => t.Rounds.Any(r => r.Id == model.RoundId));
+
             var match = await _dbContext.Matches.FirstOrDefaultAsync(t => t.TeamAName.Equals(model.TeamAName, StringComparison.InvariantCultureIgnoreCase) &&
                                                                            t.TeamBName.Equals(model.TeamBName, StringComparison.InvariantCultureIgnoreCase) &&
                                                                            t.RoundId == model.RoundId);
@@ -51,6 +55,13 @@ namespace BetsKing.Server.Services.Matches
                 await _dbContext.Matches.AddAsync(match);
 
                 await _dbContext.SaveChangesAsync();
+
+                var activeGamblers = tournament.Gamblers.Where(g => g.IsActive);
+
+                foreach (var gambler in activeGamblers)
+                {
+                    await _matchBetService.AddOrUpdateGamblerMatchBets(tournament.Id, gambler.GamblerId);
+                }
             }
 
             return match;

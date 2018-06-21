@@ -8,9 +8,9 @@ namespace BetsKing.Server.Data.Entity
 
         public string TeamBName { get; set; }
 
-        public int? TeamAScore { get; set; }
+        public int? TeamAScore { get; set; } = null;
 
-        public int? TeamBScore { get; set; }
+        public int? TeamBScore { get; set; } = null;
 
         public int RoundId { get; set; }
 
