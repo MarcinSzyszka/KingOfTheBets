@@ -1,6 +1,7 @@
 ﻿using BetsKing.Server.Data.Context;
 using BetsKing.Server.Data.Entity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
@@ -16,6 +17,7 @@ namespace BetsKing.Server
 
         public void InitProd(BetsKingDbContext dbContext)
         {
+            dbContext.Database.Migrate();
             InitData(dbContext);
         }
 

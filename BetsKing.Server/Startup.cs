@@ -35,7 +35,6 @@ namespace BetsKing.Server
                 {
                     opt.UseSqlServer(Configuration.GetConnectionString("Default")).UseInternalServiceProvider(serviceProvider);
                 });
-            services.AddDbContext<BetsKingDbContext>();
             services.AddMvc();
 
             services.AddResponseCompression(options =>

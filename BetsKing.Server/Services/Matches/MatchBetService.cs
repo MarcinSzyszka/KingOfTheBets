@@ -44,15 +44,15 @@ namespace BetsKing.Server.Services.Matches
 
             foreach (var bet in model.Bets)
             {
-                var betToUpdate = gamblerBets.FirstOrDefault(b => b.Id == bet.Id && !b.TeamAScoreBet.HasValue);
+                var betToUpdate = gamblerBets.FirstOrDefault(b => b.Id == bet.Id && !b.TeamAScore.HasValue);
 
                 if (betToUpdate == null)
                 {
                     continue;
                 }
 
-                betToUpdate.TeamAScoreBet = bet.TeamAScore;
-                betToUpdate.TeamBScoreBet = bet.TeamBScore;
+                betToUpdate.TeamAScore = bet.TeamAScore;
+                betToUpdate.TeamBScore = bet.TeamBScore;
 
                 _dbContext.Entry(betToUpdate).State = EntityState.Modified;
             }

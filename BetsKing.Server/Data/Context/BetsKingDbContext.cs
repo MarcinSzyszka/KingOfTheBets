@@ -5,6 +5,11 @@ namespace BetsKing.Server.Data.Context
 {
     public class BetsKingDbContext : DbContext
     {
+        public BetsKingDbContext()
+        {
+
+        }
+
         public BetsKingDbContext(DbContextOptions options) : base(options)
         {
         }
@@ -38,11 +43,11 @@ namespace BetsKing.Server.Data.Context
             .IsRequired(false);
 
             modelBuilder.Entity<MatchBet>()
-            .Property(b => b.TeamAScoreBet)
+            .Property(b => b.TeamAScore)
             .IsRequired(false);
 
              modelBuilder.Entity<MatchBet>()
-            .Property(b => b.TeamBScoreBet)
+            .Property(b => b.TeamBScore)
             .IsRequired(false);
 
             modelBuilder.Entity<TournamentGambler>()

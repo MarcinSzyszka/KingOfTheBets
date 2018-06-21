@@ -23,6 +23,7 @@ namespace BetsKing.Server.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Get()
         {
             var tournaments = _tournamentService.GetAll().ToList();
@@ -72,6 +73,14 @@ namespace BetsKing.Server.Controllers
             return Json(result);
         }
 
-        
+        [HttpGet("GetResults/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetResults(int id)
+        {
+            TournamentResultsViewModel result = await _tournamentService.GetResults(id);
+
+            return Json(result);
+        }
+
     }
 }

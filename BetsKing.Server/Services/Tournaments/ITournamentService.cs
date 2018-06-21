@@ -13,5 +13,6 @@ namespace BetsKing.Server.Services.Tournaments
         Task<IEnumerable<TournamentGamblerViewModel>> GetAllGamblers(int id);
         Task<bool> SetGamblers(SetTournamentGamblersViewModel model);
         Task<IEnumerable<Tournament>> GetForGambler(int gamblerId);
+        Task<TournamentResultsViewModel> GetResults(int id);
     }
 }

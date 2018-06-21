@@ -260,3 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 BetsKing.Server/appsettings.development.json
+BetsKing.Server/appsettings.production.json

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BetsKing.Server.Data.Context;
 using BetsKing.Server.Data.Entity;
+using BetsKing.Server.Extensions;
 using BetsKing.Server.Services.Matches;
 using BetsKing.Shared.ViewModels.Tournaments;
 using Microsoft.EntityFrameworkCore;
@@ -113,6 +114,60 @@ namespace BetsKing.Server.Services.Tournaments
         public async Task<IEnumerable<Tournament>> GetForGambler(int gamblerId)
         {
             return await _dbContext.Tournaments.Include(t => t.Gamblers).Where(t => t.Gamblers.Any(g => g.GamblerId == gamblerId && g.IsActive)).ToListAsync();
+        }
+
+        public async Task<TournamentResultsViewModel> GetResults(int tournamentId)
+        {
+            var tournament = await _dbContext.Tournaments.Include(t=> t.Gamblers).ThenInclude(g => g.Gambler)
+                                                         .Include( t=> t.Rounds).ThenInclude(r => r.Matches).ThenInclude(m => m.Bets)
+                                                         .FirstAsync(t => t.Id == tournamentId);
+
+            var result = new TournamentResultsViewModel
+            {
+                TournamentId = tournament.Id
+            };
+
+            var gamblers = tournament.Gamblers.Where(g => g.IsActive).Select(g => g.Gambler).Distinct().ToList();
+
+            result.GamblersResults = new List<TournamentGamblerResultsViewModel>(gamblers.Count);
+
+            foreach (var gambler in gamblers)
+            {
+                var gamblerResult = new TournamentGamblerResultsViewModel
+                {
+                    GamblerId = gambler.Id,
+                    GamblerDisplayName = gambler.DisplayName,
+                    TorunamentId = tournament.Id
+                };
+
+                var finishedMatches = tournament.Rounds.SelectMany(r => r.Matches.Where(m => m.GetResult() != Shared.Enums.MatchResultEnum.Pending));
+
+                var gamblerBets = tournament.Rounds.SelectMany(r => r.Matches.SelectMany(m => m.Bets));
+
+                foreach (var match in finishedMatches)
+                {
+                    var betForMatch = gamblerBets.FirstOrDefault(b => b.MatchId == match.Id);
+
+                    if (betForMatch == null)
+                    {
+                        //Gambler could not placed the bet for this macth
+                        continue;
+                    }
+
+                    gamblerResult.PointsForTypingMatchResult += match.GetResult() == betForMatch.GetResult() ? 1 : 0;
+
+                    if (match.TeamAScore == betForMatch.TeamAScore && match.TeamBScore == betForMatch.TeamBScore)
+                    {
+                        gamblerResult.PointsForTypingExactMatchScore += 3;
+                    }
+                }
+
+                result.GamblersResults.Add(gamblerResult);
+            }
+
+            result.GamblersResults = result.GamblersResults.OrderByDescending(g => g.GeneralPoints).ToList();
+
+            return result;
         }
     }
 }

@@ -1,8 +1,33 @@
 ﻿@page "/"
-@*@inherits BasePage*@
+@inherits BasePage
 
-<h1>Hello, world!</h1>
+<h1>Aktualne turnieje</h1>
 
-Welcome to your new app.
+<SurveyPrompt Title="Tabele się uaktualniają po wprowadzeniu wyników spotkań przez Admina." />
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@if (tournaments == null)
+{
+    <p>Ładowanie...</p>
+}
+else
+{
+    foreach (var tournament in tournaments)
+    {
+        <div class="row">
+            <TournamentTable Tournament="@tournament" />
+        </div>
+
+    }
+}
+
+
+@functions{
+
+    IEnumerable<TournamentViewModel> tournaments;
+
+    protected override async Task OnInitAsync()
+    {
+        tournaments = await ApiClient.GetJsonAuthorizedAsync<List<TournamentViewModel>>("api/tournament");
+    }
+
+}

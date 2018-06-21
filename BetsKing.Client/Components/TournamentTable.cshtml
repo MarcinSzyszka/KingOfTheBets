@@ -1,0 +1,60 @@
+﻿@inherits BetsKing.Client.Pages.BasePage
+
+<div class="card col-lg-12">
+    <div class="card-header">
+        <h3>@Tournament.Name</h3>
+    </div>
+    <div class="card-body">
+
+        @if (results != null)
+        {
+            var i = 0;
+
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Miejsce</th>
+                        <th scope="col">Typer</th>
+                        <th scope="col">Punkty</th>
+                        <th scope="col">Pkty za dokładny wynik</th>
+                        <th scope="col">Pkty za typ 1/x/2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var gambler in results.GamblersResults)
+                    {
+                        i++;
+                        <tr>
+                            <th scope="row">@i.ToString()</th>
+                            <th><a href="gamblerTournament/@Tournament.Id/@gambler.GamblerId">@gambler.GamblerDisplayName</a></th>
+                            <td>@gambler.GeneralPoints</td>
+                            <td>@gambler.PointsForTypingExactMatchScore</td>
+                            <td>@gambler.PointsForTypingMatchResult</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+
+    </div>
+</div>
+
+@functions {
+[Parameter]
+TournamentViewModel Tournament { get; set; }
+
+TournamentResultsViewModel results;
+
+int place = 1;
+
+protected override Task OnInitAsync()
+{
+    return GetAndSetResults();
+}
+
+async Task GetAndSetResults()
+{
+    results = await ApiClient.GetJsonNotAuthorizedAsync<TournamentResultsViewModel>($"api/tournament/GetResults/{Tournament.Id}");
+}
+}
